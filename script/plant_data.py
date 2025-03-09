@@ -45,7 +45,7 @@ from config import (
     IC_REGISTER_FILE_PATH,
     IC_REGISTER_MAPPING_FILE_PATH,
     PLANT_OUTPUT_FILE_PATH,
-    YEAR_OF_ANALYSIS  # from config
+    YEAR_OF_ANALYSIS
 )
 
 # Import the network data function to retrieve node information.
@@ -144,9 +144,9 @@ def clean_register_data(df: pd.DataFrame) -> pd.DataFrame:
 
     df["MW_Capacity"] = df.apply(compute_mw_capacity, axis=1)
 
-    # Optionally sort by "Asset Type" if the column exists
-    if "Asset Type" in df.columns:
-        df.sort_values(by=["Asset Type"], inplace=True)
+    # Optionally sort by "Project Name"
+    if "Project Name" in df.columns:
+        df.sort_values(by=["Project Name"], inplace=True)
 
     return df
 
