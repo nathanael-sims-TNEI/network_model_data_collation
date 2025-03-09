@@ -1,3 +1,9 @@
+"""
+Pulls network data from ETYS sheets (regions defined in config.py sheet.
+Sorts and compiles network data into dataframes corresponding to asset type.
+Dataframes form part of a dictionary which is exportable into single xlsx file (default)
+"""
+
 import warnings
 warnings.filterwarnings("ignore", message="Cannot parse header or footer so it will be ignored")
 
