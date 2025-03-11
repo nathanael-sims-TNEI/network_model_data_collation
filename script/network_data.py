@@ -1,5 +1,3 @@
-# ADD TRANSFORMERS
-
 """
 Pulls network data from ETYS sheets (regions defined in config.py sheet.
 Sorts and compiles network data into dataframes corresponding to asset type.

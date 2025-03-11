@@ -208,13 +208,15 @@ def add_etys_node(df: pd.DataFrame, nodes_df: pd.DataFrame) -> pd.DataFrame:
 
     For each row:
     1) If 'Node_Name' is not blank and an exact match exists in nodes_df['Node'], assign that value.
-    2) Otherwise, if the first 5 characters of 'Node_Name' match the first 5 characters of any node in nodes_df,
-       assign the full node name (first match only).
+    2) Otherwise, if the first 5 characters of 'Node_Name' match the first 5 characters
+       of any node in nodes_df, assign that full node name (first match only).
+    3) If still no match is found, check if the first 4 characters match and assign the corresponding node.
 
     :param df: The register DataFrame (TEC or IC) with a 'Node_Name' column.
     :param nodes_df: DataFrame containing network node data with a 'Node' column.
     :return: The updated DataFrame with an 'ETYS_Node' column.
     """
+
     def lookup_etys_node(row):
         node_name = row.get("Node_Name")
         if pd.isna(node_name) or node_name == "":
@@ -228,6 +230,11 @@ def add_etys_node(df: pd.DataFrame, nodes_df: pd.DataFrame) -> pd.DataFrame:
         partial_matches = nodes_df[nodes_df["Node"].str[:5] == node_name_prefix]
         if not partial_matches.empty:
             return partial_matches.iloc[0]["Node"]
+        # If still no match, check if the first 4 characters match.
+        node_name_prefix4 = node_name[:4]
+        partial_matches4 = nodes_df[nodes_df["Node"].str[:4] == node_name_prefix4]
+        if not partial_matches4.empty:
+            return partial_matches4.iloc[0]["Node"]
         return None
 
     df["ETYS_Node"] = df.apply(lookup_etys_node, axis=1)

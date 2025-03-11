@@ -13,6 +13,7 @@ DEMAND_FILE_PATH = os.path.join(PROJECT_DIR, "input_data/fes_2024_active_power_d
 NETWORK_OUTPUT_FILE_PATH = os.path.join(PROJECT_DIR, "output_data/Node_and_Network_Data.xlsx")
 PLANT_OUTPUT_FILE_PATH = os.path.join(PROJECT_DIR, "output_data/Plant_Data.xlsx")
 DEMAND_OUTPUT_FILE_PATH = os.path.join(PROJECT_DIR, "output_data/Demand_Data.xlsx")
+HVDC_OUTPUT_FILE_PATH = os.path.join(PROJECT_DIR, "output_data/Intra_HVDC.xlsx")
 FULL_GRID_OUTPUT_FILE_PATH = os.path.join(PROJECT_DIR, "output_data/FULL_GRID.xlsx")
 
 SHEET_ASSOCIATIONS = {"a": "SHET", "b": "SPT", "c": "NGET", "d": "OFTO"}
