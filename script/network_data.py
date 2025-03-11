@@ -1,3 +1,5 @@
+# ADD TRANSFORMERS
+
 """
 Pulls network data from ETYS sheets (regions defined in config.py sheet.
 Sorts and compiles network data into dataframes corresponding to asset type.
@@ -161,6 +163,7 @@ def concatenate_and_process_sheets(sheets_data: Dict[str, pd.DataFrame]) -> Tupl
         circuit_df = concatenate_sheets(CIRCUIT_SHEETS, sheets_data)
         logger.info("Circuit sheets concatenated.")
         transformer_df = concatenate_sheets(TRANSFORMER_SHEETS, sheets_data)
+        transformer_df['Transformer Type'] = 'Transformer'
         logger.info("Transformer sheets concatenated.")
         reactive_df = concatenate_sheets(REACTIVE_SHEETS, sheets_data)
         logger.info("Reactive sheets concatenated.")
