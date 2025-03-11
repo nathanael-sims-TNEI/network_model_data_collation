@@ -29,3 +29,5 @@ CONSIDER_DEMAND_TYPES = ["R", "E", "C", "I", "H", "D", "T", "Z"]
 # "R" = Residential, "E" = Electric Vehicles, "C" = Commercial, "I" = Industrial, "H" = Heat pumps, "D" = District heat, "T" = Transmission direct connects, "Z" = Electrolysers
 SELECTED_TAGS = {"SHET", "SPT", "NGET"}
 # 'SHET', 'SPT', 'NGET', 'OFTO'
+IGNORE_DER = 1
+# 1 = YES, 0 = NO

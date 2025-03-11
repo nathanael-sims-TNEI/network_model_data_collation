@@ -1,3 +1,9 @@
+"""
+Processes demand data by sorting the FES workbook export file based on criteria in config file.
+Associates ETYS node name to each row.
+"""
+
+
 import os
 import pandas as pd
 import config
