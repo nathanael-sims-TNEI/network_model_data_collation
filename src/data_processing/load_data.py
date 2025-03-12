@@ -8,7 +8,7 @@ import os
 import pandas as pd
 from src import config
 import logging
-from network_data import get_network_data
+from src.data_processing.network_data import get_network_data
 from typing import Optional
 
 # Configure logging per best practice.

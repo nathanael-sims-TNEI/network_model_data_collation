@@ -49,7 +49,7 @@ from src.config import (
 )
 
 # Import the network data function to retrieve node information.
-from network_data import get_network_data
+from src.data_processing.network_data import get_network_data
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")

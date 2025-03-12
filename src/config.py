@@ -1,6 +1,6 @@
 import os
 
-PROJECT_DIR = os.path.dirname(__file__)
+PROJECT_DIR = os.path.dirname(os.path.dirname(__file__))
 
 ETYSB_FILE_PATH = os.path.join(PROJECT_DIR, "input_data/etys_appendix_b_2024.xlsx")
 COORDINATES_FILE_PATH = os.path.join(PROJECT_DIR, "input_data/substation_coordinates.csv")
