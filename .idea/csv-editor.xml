@@ -10,6 +10,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\input_data\substation_coordinates.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\input_data\tec_register_04feb2025.csv">
           <value>
             <Attribute>
@@ -18,13 +25,6 @@
           </value>
         </entry>
         <entry key="\input_data\tec_register_mapping.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="\output_data\bus_ids_df.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />

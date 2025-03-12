@@ -39,7 +39,7 @@ Optionally, each DataFrame is sorted by "Asset Type" if that column exists.
 import pandas as pd
 import logging
 from typing import Dict
-from config import (
+from src.config import (
     TEC_REGISTER_FILE_PATH,
     TEC_REGISTER_MAPPING_FILE_PATH,
     IC_REGISTER_FILE_PATH,

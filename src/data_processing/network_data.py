@@ -10,7 +10,7 @@ warnings.filterwarnings("ignore", message="Cannot parse header or footer so it w
 import pandas as pd
 import logging
 from typing import Dict, List, Set, Any, Tuple
-from config import (
+from src.config import (
     ETYSB_FILE_PATH,
     COORDINATES_FILE_PATH,
     SHEET_ASSOCIATIONS,

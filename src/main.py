@@ -1,11 +1,20 @@
+"""
+This script combines the data outputs from:
+ - network_data
+ - plant_data
+ - load_data
+ - intra_hvdc_data
+ into a single output, ready for feeding into a power system model
+"""
+
 import os
 import pandas as pd
-import config
+from src import config
 
-# Import the processing functions from each script.
-from load_data import load_demand_data
-from network_data import get_network_data
-from plant_data import process_plant_data
+# Import the processing functions from each src.
+from src.data_processing.load_data import load_demand_data
+from src.data_processing.network_data import get_network_data
+from src.data_processing.plant_data import process_plant_data
 
 
 def combine_outputs():

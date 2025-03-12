@@ -1,6 +1,6 @@
 import pandas as pd
 import logging
-from config import YEAR_OF_ANALYSIS, HVDC_OUTPUT_FILE_PATH, ETYSB_FILE_PATH
+from src.config import YEAR_OF_ANALYSIS, HVDC_OUTPUT_FILE_PATH, ETYSB_FILE_PATH
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")

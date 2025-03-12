@@ -6,7 +6,7 @@ Associates ETYS node name to each row.
 
 import os
 import pandas as pd
-import config
+from src import config
 import logging
 from network_data import get_network_data
 from typing import Optional

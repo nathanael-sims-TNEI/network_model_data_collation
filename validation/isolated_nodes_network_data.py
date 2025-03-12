@@ -1,6 +1,6 @@
 import networkx as nx
 import logging
-from script.network_data import get_network_data  # adjust import path as needed
+from src.data_processing.network_data import get_network_data  # adjust import path as needed
 
 # Logging setup
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
