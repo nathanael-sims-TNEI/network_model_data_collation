@@ -14,7 +14,7 @@ from src import config
 from src.data_processing.load_data import load_demand_data
 from src.data_processing.network_data import get_network_data
 from src.data_processing.plant_data import process_plant_data
-from src.data_processing.intra_hvdc import process_intra_hvdc_data  # New import
+from src.data_processing.intra_hvdc import process_intra_hvdc_data
 
 def combine_outputs():
     demand_df = load_demand_data()
