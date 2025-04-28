@@ -46,7 +46,9 @@ from src.config import (
     IC_REGISTER_FILE_PATH,
     IC_REGISTER_MAPPING_FILE_PATH,
     PLANT_OUTPUT_FILE_PATH,
-    YEAR_OF_ANALYSIS
+    YEAR_OF_ANALYSIS,
+    SELECTED_TAGS,
+    GEN_CAPACITY_FOR_TRANSMISSION
 )
 
 # Import the network data function to retrieve node information.
@@ -100,6 +102,23 @@ def merge_mapping_with_register(register_df: pd.DataFrame, mapping_df: pd.DataFr
     logger.info(f"✅ Merged register with mapping file. Final row count: {len(merged_df)}")
     return merged_df
 
+def filter_by_selected_regions(df: pd.DataFrame, df_name: str = "DataFrame") -> pd.DataFrame:
+    """
+    Filters the provided DataFrame to include rows where 'HOST TO' is in the SELECTED_TAGS list,
+    always including 'OFTO' entries by default.
+
+    :param df: The DataFrame to filter.
+    :return: The filtered DataFrame.
+    """
+    if "HOST TO" not in df.columns:
+        logger.warning("'HOST TO' column not found in {df_name}. No filtering applied.")
+        return df
+
+    tags_to_include = SELECTED_TAGS.union({"OFTO"})
+
+    filtered_df = df[df["HOST TO"].isin(tags_to_include)].copy()
+    logger.info(f"Filtering {df_name}. 'HOST TO' options include: {sorted(df['HOST TO'].unique())}. Dataframe of {len(df)} rows to {len(filtered_df)} rows based on SELECTED_TAGS: {SELECTED_TAGS} + 'OFTO' (by default)")
+    return filtered_df
 
 def clean_register_data(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -250,7 +269,7 @@ def add_etys_node(df: pd.DataFrame, nodes_df: pd.DataFrame) -> pd.DataFrame:
             partial_matches4 = partial_matches4.copy()
             partial_matches4["5th_digit"] = partial_matches4["Node"].str[4].astype(str)
 
-            if capacity > 100:
+            if capacity > GEN_CAPACITY_FOR_TRANSMISSION:
                 # Prefer 5th digit = 2 or 4
                 first_node = partial_matches4.iloc[0]["Node"]
                 first_node_5th_digit = first_node[4]
@@ -264,7 +283,7 @@ def add_etys_node(df: pd.DataFrame, nodes_df: pd.DataFrame) -> pd.DataFrame:
                     else:
                         return first_node
             else:
-                # Prefer NOT 2 or 4 if capacity <= 100
+                # Prefer NOT 2 or 4 if capacity <= GEN_CAPACITY_FOR_TRANSMISSION
                 first_node = partial_matches4.iloc[0]["Node"]
                 first_node_5th_digit = first_node[4]
 
@@ -286,18 +305,34 @@ def add_etys_node(df: pd.DataFrame, nodes_df: pd.DataFrame) -> pd.DataFrame:
 
     df["ETYS_Node"] = df.apply(lookup_etys_node, axis=1)
 
-    # add code to:
-    # 1) if voltage is not 2 or 4 and MW capacity > 100 then return warning
-    # 2) sort the partial matches such that the highest voltage is picked based on the criteria unless explicitly defined
-    # 3) review the mapping file so that voltage is not stated unless known
+    # Check if the 5th digit is problematic for high capacity (>GEN_CAPACITY_FOR_TRANSMISSION)
+    for idx, row in df.iterrows():
+        etys_node = row.get("ETYS_Node")
+        if pd.isna(etys_node) or len(str(etys_node)) < 5:
+            continue  # skip if ETYS_Node is missing or less than 5 digits
+
+        fifth_digit = str(etys_node)[4]
+        capacity = max(
+            row.get("MW_Capacity", 0) or 0,
+            row.get("MW_Import_Capacity", 0) or 0,
+            row.get("MW_Export_Capacity", 0) or 0
+        )
+
+        if capacity > GEN_CAPACITY_FOR_TRANSMISSION and fifth_digit not in ["2", "4"]:
+            logger.warning(
+                f"⚠️ High-capacity project (>{GEN_CAPACITY_FOR_TRANSMISSION}MW) '{row.get('Project Name', 'Unknown')}' "
+                f"assigned to node '{etys_node}' with max capacity={capacity} with 5th digit '{fifth_digit}' not 2 or 4 i.e. not 275 or 400kV."
+            )
 
     return df
+    # add code to:
+    # 2) sort the partial matches such that the highest voltage is picked based on the criteria unless explicitly defined
 
 
 def process_plant_data() -> Dict[str, pd.DataFrame]:
     """
     Process plant data by merging TEC and IC registers with their respective mapping files,
-    cleaning the data (computing capacity columns) and adding the ETYS_Node column based on network node data.
+    cleaning the data (computing capacity columns), adding the ETYS_Node column, and filtering by selected tags.
 
     :return: Dictionary containing the processed TEC and IC register DataFrames.
     """
@@ -312,6 +347,10 @@ def process_plant_data() -> Dict[str, pd.DataFrame]:
     # Merge Node_Name into registers.
     tec_merged = merge_mapping_with_register(tec_register_df, tec_mapping_df)
     ic_merged = merge_mapping_with_register(ic_register_df, ic_mapping_df)
+
+    # Filter by SELECTED_TAGS
+    tec_merged = filter_by_selected_regions(tec_merged, df_name="TEC Register")
+    ic_merged = filter_by_selected_regions(ic_merged, df_name="IC Register")
 
     # Clean registers (compute MW capacity columns).
     tec_merged = clean_register_data(tec_merged)
@@ -328,6 +367,7 @@ def process_plant_data() -> Dict[str, pd.DataFrame]:
         ic_merged = add_etys_node(ic_merged, nodes_df)
 
     return {"tec_register": tec_merged, "ic_register": ic_merged}
+
 
 
 def main() -> None:

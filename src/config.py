@@ -16,6 +16,7 @@ SELECTED_TAGS = {'NGET'}
 # Note: 'OFTO' should be selected ONLY if 'SHET', 'SPT' and 'NGET' are also selected, to avoid isolated OFTO nodes.
 IGNORE_DER = 1 # YET TO CONFIGURE?
 # 1 = YES, 0 = NO
+GEN_CAPACITY_FOR_TRANSMISSION = 100
 
 
 # ---------------------------

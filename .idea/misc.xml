@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.13 (network_model_data_collation)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.9 (venv3)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (base)" project-jdk-type="Python SDK" />
 </project>
