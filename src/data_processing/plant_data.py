@@ -38,6 +38,7 @@ Optionally, each DataFrame is sorted by "Asset Type" if that column exists.
 
 import pandas as pd
 import logging
+import sys
 from typing import Dict
 from src.config import (
     TEC_REGISTER_FILE_PATH,
@@ -83,12 +84,12 @@ def merge_mapping_with_register(register_df: pd.DataFrame, mapping_df: pd.DataFr
     logger.info(f"Mapping Columns: {mapping_df.columns.tolist()}")
 
     if "Project Number" not in register_df.columns or "Project Number" not in mapping_df.columns:
-        logger.warning("❌ 'Project Number' column missing in one of the datasets. Skipping merge.")
-        return register_df
+        logger.warning("❌ 'Project Number' column missing in one of the datasets. Exiting.")
+        sys.exit()
 
     if "Node_Name" not in mapping_df.columns:
-        logger.warning("❌ 'Node_Name' column missing in mapping dataset. Skipping merge.")
-        return register_df
+        logger.warning("❌ 'Node_Name' column missing in mapping dataset. Exiting.")
+        sys.exit()
 
     merged_df = register_df.merge(
         mapping_df[["Project Number", "Node_Name"]],
@@ -121,7 +122,8 @@ def clean_register_data(df: pd.DataFrame) -> pd.DataFrame:
     if "MW Effective From" in df.columns:
         df["MW Effective From"] = pd.to_datetime(df["MW Effective From"], errors="coerce")
     else:
-        logger.warning("'MW Effective From' column not found in DataFrame.")
+        logger.warning("'MW Effective From' column not found in DataFrame. Exiting.")
+        sys.exit()
 
     def compute_mw_capacity(row):
         effective_year = row["MW Effective From"].year if pd.notnull(row.get("MW Effective From")) else None
@@ -221,23 +223,74 @@ def add_etys_node(df: pd.DataFrame, nodes_df: pd.DataFrame) -> pd.DataFrame:
         node_name = row.get("Node_Name")
         if pd.isna(node_name) or node_name == "":
             return None
-        # Check for an exact match in network nodes.
+
+        # First, try exact match
         exact_matches = nodes_df[nodes_df["Node"] == node_name]
         if not exact_matches.empty:
             return exact_matches.iloc[0]["Node"]
-        # If no exact match, check if the first 5 characters match.
-        node_name_prefix = node_name[:5]
-        partial_matches = nodes_df[nodes_df["Node"].str[:5] == node_name_prefix]
-        if not partial_matches.empty:
-            return partial_matches.iloc[0]["Node"]
-        # If still no match, check if the first 4 characters match.
+
+        # If no exact match, check first 5 characters
+        node_name_prefix5 = node_name[:5]
+        partial_matches5 = nodes_df[nodes_df["Node"].str[:5] == node_name_prefix5]
+        if not partial_matches5.empty:
+            return partial_matches5.iloc[0]["Node"]
+
+        # If still no match, check first 4 characters
         node_name_prefix4 = node_name[:4]
         partial_matches4 = nodes_df[nodes_df["Node"].str[:4] == node_name_prefix4]
         if not partial_matches4.empty:
-            return partial_matches4.iloc[0]["Node"]
+            # Apply advanced selection based on 5th character and capacity
+            capacity = max(
+                row.get("MW_Capacity", 0) or 0,
+                row.get("MW_Import_Capacity", 0) or 0,
+                row.get("MW_Export_Capacity", 0) or 0
+            )
+
+            # Add a column extracting the 5th character as an integer
+            partial_matches4 = partial_matches4.copy()
+            partial_matches4["5th_digit"] = partial_matches4["Node"].str[4].astype(str)
+
+            if capacity > 100:
+                # Prefer 5th digit = 2 or 4
+                first_node = partial_matches4.iloc[0]["Node"]
+                first_node_5th_digit = first_node[4]
+
+                if first_node_5th_digit in ["2", "4"]:
+                    return first_node
+                else:
+                    preferred = partial_matches4[partial_matches4["5th_digit"].isin(["2", "4"])]
+                    if not preferred.empty:
+                        return preferred.iloc[0]["Node"]
+                    else:
+                        return first_node
+            else:
+                # Prefer NOT 2 or 4 if capacity <= 100
+                first_node = partial_matches4.iloc[0]["Node"]
+                first_node_5th_digit = first_node[4]
+
+                if first_node_5th_digit not in ["2", "4"]:
+                    return first_node
+                else:
+                    non_preferred = partial_matches4[~partial_matches4["5th_digit"].isin(["2", "4"])]
+                    if not non_preferred.empty:
+                        return non_preferred.iloc[0]["Node"]
+                    else:
+                        return first_node
+
+        # No matches at all
+        logger.warning(
+            f"⚠️ No ETYS Node match found for Project '{row.get('Project Name', 'Unknown')}', "
+            f"Node_Name '{node_name}'"
+        )
         return None
 
     df["ETYS_Node"] = df.apply(lookup_etys_node, axis=1)
+
+    # add code to:
+    # 1) if voltage is not 2 or 4 and MW capacity > 100 then return warning
+    # 2) sort the partial matches such that the highest voltage is picked based on the criteria unless explicitly defined
+    # 3) review the mapping file so that voltage is not stated unless known
+
     return df
 
 

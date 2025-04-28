@@ -11,8 +11,9 @@ FES_SCENARIO = "HT"
 # "HT" = Holistic Transition, "HE" = Hydrogen Evolution, "EE" = Electric Engagement
 CONSIDER_DEMAND_TYPES = ["R", "E", "C", "I", "H", "D", "T", "Z"]
 # "R" = Residential, "E" = Electric Vehicles, "C" = Commercial, "I" = Industrial, "H" = Heat pumps, "D" = District heat, "T" = Transmission direct connects, "Z" = Electrolysers
-SELECTED_TAGS = {"SHET", "SPT", "NGET", "OFTO"}
+SELECTED_TAGS = {'NGET'}
 # 'SHET', 'SPT', 'NGET', 'OFTO'
+# Note: 'OFTO' should be selected ONLY if 'SHET', 'SPT' and 'NGET' are also selected, to avoid isolated OFTO nodes.
 IGNORE_DER = 1 # YET TO CONFIGURE?
 # 1 = YES, 0 = NO
 
